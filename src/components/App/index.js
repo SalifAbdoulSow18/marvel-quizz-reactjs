@@ -1,16 +1,29 @@
 import React from 'react';
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import Header from "../Header";
+import Welcome from "../Welcome";
 import Accueil from "../Accueil";
+import Login from "../Login";
+import SignUp from "../SignUp";
+import ErrorPage from "../ErrorPage";
 import Footer from "../Footer";
 import '../../App.css';
 
 function App() {
   return (
-    <div>
+    <Router>
       <Header />
-      <Accueil />
+
+      <Switch>
+          <Route exact path="/" component={Accueil} />
+          <Route path="/welcome" component={Welcome} />
+          <Route path="/login" component={Login} />
+          <Route path="/sign-up" component={SignUp} />
+          <Route component={ErrorPage} />
+      </Switch>
+
       <Footer />
-    </div>
+    </Router>
   );
 }
 
