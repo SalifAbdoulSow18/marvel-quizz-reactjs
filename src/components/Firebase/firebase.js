@@ -15,15 +15,14 @@ class Firebase {
         app.initializeApp(firebaseConfig);
         this.auth = app.auth();
     }
-
     //Inscription
     signupUser = (email, password) => {
-        this.auth.createUserWithEmailAndPassword(email, password);
+        return Promise.resolve(this.auth.createUserWithEmailAndPassword(email, password));
     }
 
     //Connexion
     loginUser = (email, password) => {
-        this.auth.signInWithEmailAndPassword(email, password);
+        return Promise.resolve(this.auth.signInWithEmailAndPassword(email, password));
     }
 
     //Deconnexion
