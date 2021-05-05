@@ -59,6 +59,7 @@ const Login = (props) => {
                         </form>
                         <div className="linkContainer">
                             <Link className="simpleLink" to="/sign-up">Nouveau sur Marvel Quiz? Inscrivez-vous!</Link>
+                            <Link className="simpleLink" to="/forget-password" style={{float: "right"}}>Mot de passe oublié? Récupérez!</Link>
                         </div>
                     </div>
                 </div>
