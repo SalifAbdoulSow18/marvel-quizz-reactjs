@@ -55,6 +55,7 @@ const SignUp = (props) => {
     // Gestion d'error
     const errorMsg = error !== '' && <span>{error.message}</span>;
 
+    // La structure html
     return (
        <div className="signUpLoginBox">
           <div className="slContainer">
