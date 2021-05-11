@@ -5,27 +5,37 @@ import {QuizMarvel} from "../quizMarvel";
 import Levels from "../Levels";
 import Progressbar from "../Progressbar";
 import QuizOver from "../QuizOver";
+import { FaChevronRight } from 'react-icons/fa';
 
 toast.configure();
 class Quiz extends Component{
 
-    state = {
-        levelNames: ["debutant", "confirme", "expert"],
-        quizLevel: 0,
-        maxQuestions: 10,
-        storedQuestions: [],
-        question: null,
-        options: [],
-        idQuestion: 0,
-        btnDisabled: true,
-        userAnswer: null,
-        score: 0,
-        showWelcomeMsg: false,
-        quizEnd: false,
-        percent: 0
+    constructor(props) {
+        super(props);
+
+        this.initialState = {
+            levelNames: ["debutant", "confirme", "expert"],
+            quizLevel: 0,
+            maxQuestions: 10,
+            storedQuestions: [],
+            question: null,
+            options: [],
+            idQuestion: 0,
+            btnDisabled: true,
+            userAnswer: null,
+            score: 0,
+            showWelcomeMsg: false,
+            quizEnd: false,
+            percent: null
+        }
+
+        this.state = this.initialState
+
+        this.storeDataRef = React.createRef();
     }
 
-    storeDataRef = React.createRef();
+
+
 
     // La fonction permettant de recupérer les questions d'un niveau donné
     loadQuestions = level => {
@@ -57,7 +67,7 @@ class Quiz extends Component{
     componentDidUpdate(prevProps, prevState, snapshot) {
 
         // La recupération des premieres responses et de la premiere quetion
-        if (this.state.storedQuestions !== prevState.storedQuestions) {
+        if ((this.state.storedQuestions !== prevState.storedQuestions) && this.state.storedQuestions.length) {
             this.setState({
                 question: this.state.storedQuestions[this.state.idQuestion].question,
                 options: this.state.storedQuestions[this.state.idQuestion].options
@@ -65,7 +75,7 @@ class Quiz extends Component{
         }
 
         // La recupération des responses et de la question après incrementation
-        if (this.state.idQuestion !== prevState.idQuestion) {
+        if ((this.state.idQuestion !== prevState.idQuestion) && this.state.storedQuestions.length) {
             this.setState({
                 question: this.state.storedQuestions[this.state.idQuestion].question,
                 options: this.state.storedQuestions[this.state.idQuestion].options,
@@ -74,14 +84,19 @@ class Quiz extends Component{
             })
         }
 
+        if (this.state.quizEnd !== prevState.quizEnd) {
+            const gradePercent = this.getPercentage(this.state.maxQuestions, this.state.score);
+            this.gameOver(gradePercent)
+        }
+
         //Verifiez que le pseudo a bien été receptionné
-        if (this.props.myPseudo.pseudo) {
-            this.showWelcomeMsg(this.props.myPseudo.pseudo)
+        if (this.props.myPseudo.pseudo !== prevProps.myPseudo.pseudo) {
+            this.showToastMsg(this.props.myPseudo.pseudo)
         }
     }
 
     // La fonction permettant d'afficher un message de bienvenue
-    showWelcomeMsg = pseudo => {
+    showToastMsg = pseudo => {
         if (!this.state.showWelcomeMsg) {
             this.setState({
                 showWelcomeMsg: true
@@ -111,19 +126,15 @@ class Quiz extends Component{
     getPercentage = (maxQuest, ourScore) => (ourScore / maxQuest) * 100;
 
     // La fonction de la fin du jeux
-    gameOver = () => {
-        const gradePercent = this.getPercentage(this.state.maxQuestions, this.state.score);
-        if (gradePercent >= 50) {
+    gameOver = percent => {
+
+        if (percent >= 50) {
             this.setState({
                 quizLevel: this.state.quizLevel + 1,
-                percent: gradePercent,
-                quizEnd: true
+                percent,
             })
         } else {
-            this.setState({
-                percent: gradePercent,
-                quizEnd: true
-            })
+            this.setState({percent})
         }
     }
 
@@ -131,7 +142,10 @@ class Quiz extends Component{
     nextQuestion = () => {
        if (this.state.idQuestion === this.state.maxQuestions - 1) {
         //end Game
-           this.gameOver();
+           //this.gameOver();
+           this.setState({
+               quizEnd: true
+           })
 
        } else {
        // incrémenté le idQuestion qui regroupe toutes les info d'une question donnée
@@ -172,6 +186,11 @@ class Quiz extends Component{
        }
     }
 
+    loadLevelQuestions = param => {
+        this.setState({...this.initialState, quizLevel: param})
+        this.loadQuestions(this.state.levelNames[param]);
+    }
+
     render() {
         const {pseudo} = this.props.myPseudo;
 
@@ -181,7 +200,7 @@ class Quiz extends Component{
                    key={index}
                    onClick={() => this.submitAnswer(option)}
                    className={`answerOptions ${this.state.userAnswer === option ? "selected" : null}`}>
-                    {option}
+                   <FaChevronRight />   {option}
                 </p>
             )
         })
@@ -194,13 +213,19 @@ class Quiz extends Component{
                maxQuestions = {this.state.maxQuestions}
                quizLevel = {this.state.quizLevel}
                percent ={this.state.percent}
+               loadLevelQuestions = {this.loadLevelQuestions}
             />
         )
         :
          (
             <Fragment>
                 {/*<h2>Pseudo: {pseudo}</h2>*/}
-                <Levels />
+
+                <Levels
+                    levelNames= {this.state.levelNames}
+                    quizLevel= {this.state.quizLevel}
+                />
+
                 <Progressbar
                     idQuestion = {this.state.idQuestion}
                     maxQuestions = {this.state.maxQuestions}
