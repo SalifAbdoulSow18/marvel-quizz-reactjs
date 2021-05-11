@@ -21,7 +21,8 @@ class Quiz extends Component{
         userAnswer: null,
         score: 0,
         showWelcomeMsg: false,
-        quizEnd: false
+        quizEnd: false,
+        percent: 0
     }
 
     storeDataRef = React.createRef();
@@ -84,7 +85,7 @@ class Quiz extends Component{
         if (!this.state.showWelcomeMsg) {
             this.setState({
                 showWelcomeMsg: true
-            })
+            });
 
             toast.warn(`Bienvenue ${pseudo}, et bonne chance!`, {
                 position: "top-right",
@@ -106,10 +107,24 @@ class Quiz extends Component{
         })
     }
 
+    //La fonction permettant d'avoir le % de score dans le jeux
+    getPercentage = (maxQuest, ourScore) => (ourScore / maxQuest) * 100;
+
+    // La fonction de la fin du jeux
     gameOver = () => {
-        this.setState({
-            quizEnd: true
-        })
+        const gradePercent = this.getPercentage(this.state.maxQuestions, this.state.score);
+        if (gradePercent >= 50) {
+            this.setState({
+                quizLevel: this.state.quizLevel + 1,
+                percent: gradePercent,
+                quizEnd: true
+            })
+        } else {
+            this.setState({
+                percent: gradePercent,
+                quizEnd: true
+            })
+        }
     }
 
     // La fonction lorsqu'on veut passer la la question suivante
@@ -172,14 +187,24 @@ class Quiz extends Component{
         })
 
         return this.state.quizEnd ? (
-            <QuizOver />
+            <QuizOver
+               ref ={this.storeDataRef}
+               levelNames = {this.state.levelNames}
+               score = {this.state.score}
+               maxQuestions = {this.state.maxQuestions}
+               quizLevel = {this.state.quizLevel}
+               percent ={this.state.percent}
+            />
         )
         :
          (
             <Fragment>
                 {/*<h2>Pseudo: {pseudo}</h2>*/}
                 <Levels />
-                <Progressbar />
+                <Progressbar
+                    idQuestion = {this.state.idQuestion}
+                    maxQuestions = {this.state.maxQuestions}
+                />
                 <h2>{this.state.question}</h2>
 
                 {displayOptions}
@@ -188,7 +213,7 @@ class Quiz extends Component{
                     disabled={this.state.btnDisabled}
                     onClick={this.nextQuestion}
                     className="btnSubmit">
-                    suivant
+                    { this.state.idQuestion < this.state.maxQuestions - 1 ? "Suivant" : "Terminer"}
                 </button>
             </Fragment>
 
