@@ -2,6 +2,7 @@ import React, {Fragment, useEffect, useState} from "react";
 import Loader from "../Loader";
 import {GiTrophyCup} from 'react-icons/gi';
 import Modal from "../Modal";
+import axios from "axios";
 
 const QuizOver = React.forwardRef((props, ref) => {
 
@@ -14,7 +15,7 @@ const QuizOver = React.forwardRef((props, ref) => {
         loadLevelQuestions
     } = props;
 
-    const API_PUBLIC_KEY = process.env.REACT_APP_KEY_MARVEL_API;
+    const API_PUBLIC_KEY = process.env.REACT_APP_MARVEL_API_KEY;
         console.log(API_PUBLIC_KEY);
 
     const hash = '14a74837db0909d8c252ec2ae0b81aa8';
@@ -28,6 +29,14 @@ const QuizOver = React.forwardRef((props, ref) => {
 
     const showModal = id => {
         setOpenModal(true);
+        axios
+        .get()
+        .then(response => {
+            console.log(response);
+        })
+        .catch(err => {
+            console.log(err);
+        })
     }
 
     const hideModal = id => {
