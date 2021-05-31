@@ -1,15 +1,38 @@
 import React, {Fragment, useEffect, useState} from "react";
+import Loader from "../Loader";
 import {GiTrophyCup} from 'react-icons/gi';
+import Modal from "../Modal";
 
 const QuizOver = React.forwardRef((props, ref) => {
 
-    const {levelNames, score, maxQuestions, quizLevel, percent, loadLevelQuestions} = props
+    const {
+        levelNames,
+        score,
+        maxQuestions,
+        quizLevel,
+        percent,
+        loadLevelQuestions
+    } = props;
+
+    const API_PUBLIC_KEY = process.env.REACT_APP_KEY_MARVEL_API;
+        console.log(API_PUBLIC_KEY);
+
+    const hash = '14a74837db0909d8c252ec2ae0b81aa8';
 
     const [asked, setAsked] = useState([]);
+    const [openModal, setOpenModal] = useState(false);
 
     useEffect(() => {
         setAsked(ref.current)
     }, [ref]);
+
+    const showModal = id => {
+        setOpenModal(true);
+    }
+
+    const hideModal = id => {
+        setOpenModal(false);
+    }
 
     const averageGrade = maxQuestions / 2
 
@@ -74,7 +97,12 @@ const QuizOver = React.forwardRef((props, ref) => {
                     <td>{question.question}</td>
                     <td>{question.answer}</td>
                     <td>
-                        <button className="btnInfo">Infos</button>
+                        <button
+                            className="btnInfo"
+                            onClick={ () => showModal(question.heroId)}
+                        >
+                            Infos
+                        </button>
                     </td>
                 </tr>
             )
@@ -84,10 +112,10 @@ const QuizOver = React.forwardRef((props, ref) => {
         (
             <tr>
                 <td colSpan="3">
-                    <div className="loader"></div>
-                    <p style={{textAlign: "center", color: "red"}}>
-                        Pas de réponses!
-                    </p>
+                    <Loader
+                        loadingMsg={"Pas de response!"}
+                        styling={{textAlign: "center", color: "red"}}
+                    />
                 </td>
             </tr>
         )
@@ -112,6 +140,20 @@ const QuizOver = React.forwardRef((props, ref) => {
                     </tbody>
                 </table>
             </div>
+
+            <Modal showModal={openModal} hideModal={hideModal}>
+                <div className="modalHeader">
+                    <h2>Title</h2>
+                </div>
+
+                <div className="modalBody">
+                    <h3>Body</h3>
+                </div>
+
+                <div className="modalFooter">
+                    <button className="modalBtn"> Fermer </button>
+                </div>
+            </Modal>
         </Fragment>
     );
 })
