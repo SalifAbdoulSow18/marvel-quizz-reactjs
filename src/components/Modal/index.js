@@ -1,8 +1,8 @@
 import React, { Fragment } from 'react';
-const Modal = ({showModal, children, hideModal}) => {
+const Modal = ({showModal, children}) => {
     return (
         showModal && (
-            <div className="modalBackground" onClick={hideModal}>
+            <div className="modalBackground">
                 <div className="modalContainer">
                     {children}
                 </div>
